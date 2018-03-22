@@ -19,14 +19,15 @@ import tensorflow as tf
 from object_detection.utils import learning_schedules
 
 
-def build(optimizer_config):
+def build(optimizer_config, global_summaries):
   """Create optimizer based on config.
 
   Args:
     optimizer_config: A Optimizer proto message.
+    global_summaries: A set to attach learning rate summary to.
 
   Returns:
-    An optimizer and a list of variables for summary.
+    An optimizer.
 
   Raises:
     ValueError: when using an unsupported input data type.
@@ -34,30 +35,24 @@ def build(optimizer_config):
   optimizer_type = optimizer_config.WhichOneof('optimizer')
   optimizer = None
 
-  summary_vars = []
   if optimizer_type == 'rms_prop_optimizer':
     config = optimizer_config.rms_prop_optimizer
-    learning_rate = _create_learning_rate(config.learning_rate)
-    summary_vars.append(learning_rate)
     optimizer = tf.train.RMSPropOptimizer(
-        learning_rate,
+        _create_learning_rate(config.learning_rate, global_summaries),
         decay=config.decay,
         momentum=config.momentum_optimizer_value,
         epsilon=config.epsilon)
 
   if optimizer_type == 'momentum_optimizer':
     config = optimizer_config.momentum_optimizer
-    learning_rate = _create_learning_rate(config.learning_rate)
-    summary_vars.append(learning_rate)
     optimizer = tf.train.MomentumOptimizer(
-        learning_rate,
+        _create_learning_rate(config.learning_rate, global_summaries),
         momentum=config.momentum_optimizer_value)
 
   if optimizer_type == 'adam_optimizer':
     config = optimizer_config.adam_optimizer
-    learning_rate = _create_learning_rate(config.learning_rate)
-    summary_vars.append(learning_rate)
-    optimizer = tf.train.AdamOptimizer(learning_rate)
+    optimizer = tf.train.AdamOptimizer(
+        _create_learning_rate(config.learning_rate, global_summaries))
 
   if optimizer is None:
     raise ValueError('Optimizer %s not supported.' % optimizer_type)
@@ -66,14 +61,15 @@ def build(optimizer_config):
     optimizer = tf.contrib.opt.MovingAverageOptimizer(
         optimizer, average_decay=optimizer_config.moving_average_decay)
 
-  return optimizer, summary_vars
+  return optimizer
 
 
-def _create_learning_rate(learning_rate_config):
+def _create_learning_rate(learning_rate_config, global_summaries):
   """Create optimizer learning rate based on config.
 
   Args:
     learning_rate_config: A LearningRate proto message.
+    global_summaries: A set to attach learning rate summary to.
 
   Returns:
     A learning rate.
@@ -85,7 +81,7 @@ def _create_learning_rate(learning_rate_config):
   learning_rate_type = learning_rate_config.WhichOneof('learning_rate')
   if learning_rate_type == 'constant_learning_rate':
     config = learning_rate_config.constant_learning_rate
-    learning_rate = tf.constant(config.learning_rate, dtype=tf.float32)
+    learning_rate = config.learning_rate
 
   if learning_rate_type == 'exponential_decay_learning_rate':
     config = learning_rate_config.exponential_decay_learning_rate
@@ -119,4 +115,5 @@ def _create_learning_rate(learning_rate_config):
   if learning_rate is None:
     raise ValueError('Learning_rate %s not supported.' % learning_rate_type)
 
+  global_summaries.add(tf.summary.scalar('Learning_Rate', learning_rate))
   return learning_rate
