@@ -63,7 +63,7 @@ if __name__ == '__main__':
                 feed_dict={image_tensor: image_np_expanded})
             
             print('skye boxes=', boxes)
-            scores[0][0] = 0.99
+            # scores[0][0] = 0.99 # Output.png 上面没有预测结果信息. 准确率太低？是的。最后的框是会有个准确率阈值的。
             print('skye scores=',scores)
             print('skye classes=', classes)
             print('skye category_index=', category_index)
