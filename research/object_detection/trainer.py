@@ -190,6 +190,7 @@ def train(create_tensor_dict_fn, create_model_fn, train_config, master, task,
     train_dir: Directory to write checkpoints and training summaries to.
   """
 
+  print('skye batch_size = ', train_config.batch_size)
   detection_model = create_model_fn()
   data_augmentation_options = [
       preprocessor_builder.build(step)
