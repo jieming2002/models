@@ -160,6 +160,10 @@ class WeightedSmoothL1LocalizationLoss(Loss):
     anchorwise_smooth_l1norm = tf.reduce_sum(
         tf.where(abs_diff_lt_1, 0.5 * tf.square(abs_diff), abs_diff - 0.5),
         2) * weights
+    
+    # print('skye WeightedSmoothL1LocalizationLoss() self._anchorwise_output=', self._anchorwise_output)
+    # print('skye WeightedSmoothL1LocalizationLoss() anchorwise_smooth_l1norm=', anchorwise_smooth_l1norm)
+    
     if self._anchorwise_output:
       return anchorwise_smooth_l1norm
     return tf.reduce_sum(anchorwise_smooth_l1norm)

@@ -464,6 +464,10 @@ class SSDMetaArch(model.DetectionModel):
           batch_reg_targets,
           ignore_nan_targets=True,
           weights=batch_reg_weights)
+      
+      # print('skye location_losses=', location_losses)
+      # print('skye location_losses.shape=', location_losses.shape)
+
       cls_losses = self._classification_loss(
           prediction_dict['class_predictions_with_background'],
           batch_cls_targets,

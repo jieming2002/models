@@ -61,7 +61,14 @@ if __name__ == '__main__':
             (boxes, scores, classes, num) = sess.run(
                 [detection_boxes, detection_scores, detection_classes, num_detections],
                 feed_dict={image_tensor: image_np_expanded})
-            vis_util.visualize_boxes_and_labels_on_image_array(
+            
+            print('skye boxes=', boxes)
+            print('skye scores=',scores)
+            print('skye classes=', classes)
+            print('skye num=', num)
+            print('skye category_index=', category_index)
+
+            image_np = vis_util.visualize_boxes_and_labels_on_image_array(
                 image_np,
                 np.squeeze(boxes),
                 np.squeeze(classes).astype(np.int32),
