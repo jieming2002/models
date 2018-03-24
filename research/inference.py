@@ -75,5 +75,6 @@ if __name__ == '__main__':
                 np.squeeze(scores),
                 category_index,
                 use_normalized_coordinates=True,
+                min_score_thresh=.3,
                 line_thickness=8)
             plt.imsave(os.path.join(FLAGS.output_dir, 'output.png'), image_np)
