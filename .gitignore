@@ -5,7 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
-research/quiz-w8/data/
+
+research/data/
+research/output/
 
 # Distribution / packaging
 .Python

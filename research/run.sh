@@ -9,8 +9,8 @@ echo current dir is $PWD
 export PYTHONPATH=$PYTHONPATH:$DIR:$DIR/slim:$DIR/object_detection
 
 # 定义各目录
-output_dir=$DIR/quiz-w8/output  # 训练目录
-dataset_dir=/data/jieming2002/quiz-w8-data-1 # 数据集目录，这里是写死的，记得修改
+output_dir=/output  # 训练目录，不要改，否则 tinymind 上其他目录没有权限。在本地也要按照这个目录结构 
+dataset_dir=/data/jieming2002/quiz-w8-data-1 # 数据集目录，tinymind 上需要的数据文件都在这里，在本地也要按照这个目录结构
 
 train_dir=$output_dir/train
 checkpoint_dir=$train_dir
