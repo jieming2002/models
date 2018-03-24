@@ -30,8 +30,8 @@ cp $dataset_dir/$config $pipeline_config_path
 for i in {0..5}  #for循环中的代码执行 5 次，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
 do
     echo "############" $i "runnning #################"
-    last=$[$i*100]
-    current=$[($i+1)*100]
+    last=$[$i*1080]
+    current=$[($i+1)*1080]
     sed -i "s/^  num_steps: $last$/  num_steps: $current/g" $pipeline_config_path  # 通过num_steps控制一次训练最多100step
 
     echo "############" $i "training #################"
