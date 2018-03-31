@@ -8,6 +8,7 @@ __pycache__/
 
 research/data/
 research/output/
+research/checkpoint/
 
 # Distribution / packaging
 .Python

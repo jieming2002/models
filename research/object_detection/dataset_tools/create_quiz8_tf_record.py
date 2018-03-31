@@ -163,6 +163,9 @@ def create_tf_record(output_filename,
   """
   writer = tf.python_io.TFRecordWriter(output_filename)
   for idx, example in enumerate(examples):
+    print('example=', example)
+    logging.warning('skye here')
+    
     if idx % 100 == 0:
       logging.info('On image %d of %d', idx, len(examples))
     xml_path = os.path.join(annotations_dir, 'xmls', example + '.xml')
