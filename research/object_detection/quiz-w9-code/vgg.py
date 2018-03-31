@@ -218,8 +218,8 @@ def vgg_16(inputs,
                     net = tf.squeeze(net, [1, 2], name='fc8/squeezed')
                 end_points[sc.name + '/fc8'] = net
             
-            print('skye net =', net)
-            print('skye end_points =', end_points)
+            # print('skye net =', net)
+            # print('skye end_points =', end_points)
             return net, end_points
 
 
