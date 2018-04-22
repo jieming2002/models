@@ -1,0 +1,27 @@
+﻿本地运行slim框架所用命令行：
+作业1
+训练：
+python train_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --checkpoint_path=/tmp/checkpoints/inception_v4.ckpt --model_name=inception_v4 --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --train_dir=/tmp/flowers-models/inception_v4 --learning_rate=0.001 --optimizer=rmsprop  --batch_size=32
+
+train集验证：
+python eval_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --dataset_split_name=train --model_name=inception_v4 --checkpoint_path=/tmp/flowers-models/inception_v4 --eval_dir=/tmp/flowers-models/inception_v4 --batch_size=32 --max_num_batches=128
+
+validation集验证：
+python eval_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --dataset_split_name=validation --model_name=inception_v4 --checkpoint_path=/tmp/flowers-models/inception_v4 --eval_dir=/tmp/flowers-models/inception_v4 --batch_size=32 --max_num_batches=128
+
+统一脚本：
+python train_eval_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --checkpoint_path=/tmp/checkpoints/inception_v4.ckpt --model_name=inception_v4 --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --optimizer=rmsprop --train_dir=/tmp/flowers-models/densenet --learning_rate=0.001 --dataset_split_name=validation --eval_dir=/tmp/flowers-models/inception_v4 --max_num_batches=128
+
+作业2
+训练
+python train_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --model_name=densenet --train_dir=/tmp/flowers-models/densenet --learning_rate=0.1 --optimizer=rmsprop  --batch_size=16
+
+train集验证：
+python eval_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --dataset_split_name=train --model_name=densenet --checkpoint_path=/tmp/flowers-models/densenet --eval_dir=/tmp/flowers-models/densenet --batch_size=32 --max_num_batches=128
+
+validation集验证：
+python eval_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --dataset_split_name=validation --model_name=densenet --checkpoint_path=/tmp/flowers-models/densenet --eval_dir=/tmp/flowers-models/densenet --batch_size=32 --max_num_batches=128
+
+统一脚本：
+python train_eval_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --model_name=densenet --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --train_dir=/tmp/flowers-models/densenet --learning_rate=0.1 --dataset_split_name=validation --eval_dir=/tmp/flowers-models/densenet --max_num_batches=128
+
