@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+research/slim/tmp/
 
 # Distribution / packaging
 .Python
