@@ -11,7 +11,7 @@ python eval_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001
 
 作业1
 训练：
-python train_image_classifier.py --dataset_name=flowers --dataset_dir=/tmp/flowers --checkpoint_path=/tmp/checkpoints/inception_v4.ckpt --model_name=inception_v4 --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --train_dir=/tmp/flowers-models/inception_v4 --learning_rate=0.001 --optimizer=rmsprop  --batch_size=32
+python train_image_classifier.py --dataset_name=flowers --dataset_dir=./tmp/flowers --checkpoint_path=./tmp/checkpoints/inception_v4.ckpt --model_name=inception_v4 --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --train_dir=./tmp/flowers-models/inception_v4 --learning_rate=0.001 --optimizer=rmsprop  --batch_size=2
 
 train集验证：
 python eval_image_classifier.py --dataset_name=flowers --dataset_dir=./tmp/flowers --dataset_split_name=train --model_name=inception_v4 --checkpoint_path=./tmp/flowers-models/inception_v4 --eval_dir=./tmp/flowers-models/inception_v4 --batch_size=32 --max_num_batches=128
