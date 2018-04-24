@@ -5,6 +5,7 @@ from datasets import dataset_factory
 from nets import nets_factory
 from preprocessing import preprocessing_factory
 import numpy as np
+import os
 
 
 tf.app.flags.DEFINE_string(
@@ -32,6 +33,30 @@ FLAGS = tf.app.flags.FLAGS
 
 is_training = False
 preprocessing_name = FLAGS.model_name
+
+
+# get label of model predict test image top_k predict
+def get_label_predict_top_k(logits, labels, top_k):
+    """
+    logits : an array
+    labels : a dict of index to class name
+    return top-5 of label name
+    """
+    # array 2 list
+    predict_list = list(logits[0][0])
+    # print('len(predict_list) =', len(predict_list))
+    # print('predict_list =', predict_list)
+    
+    min_label = min(predict_list)
+    label_k = ''
+    for i in range(top_k):
+        label = np.argmax(predict_list)
+        predict_list.remove(predict_list[label])
+        predict_list.insert(label, min_label)
+        label_name = labels[label]
+        label_k += label_name
+    return label_k
+
 
 graph = tf.Graph().as_default()
 
@@ -81,8 +106,8 @@ with tf.Session() as sess:
     image_value = open(FLAGS.pic_path, mode='rb').read()
 
     logit_value = sess.run([logit], feed_dict={placeholder:image_value})
-    print('logit_value = ', logit_value)
-    argmax = np.argmax(logit_value)
-    print('argmax = ', argmax)
-    class_name = labels_to_class_names[argmax]
-    print('class_name = ', class_name)
+    # print('logit_value = ', logit_value)
+    image_name = os.path.basename(FLAGS.pic_path)
+    print('image name = ', image_name)
+    argmax = get_label_predict_top_k(logit_value, labels_to_class_names, 5)
+    print('top5 = ', argmax)

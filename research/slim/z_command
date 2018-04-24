@@ -9,7 +9,7 @@ python train_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd00
 
 python eval_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --dataset_split_name=validation --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --eval_dir=./tmp/tmd001-models/inception_v4 --batch_size=8 --max_num_batches=12
 
-python inference_with_checkpoint.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --pic_path=./tmp/tmd001_raw_data/test1/6b0be04111f20e4db019930a7c33274caacb657b.jpg
+python inference_with_checkpoint.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --pic_path=./tmp/tmd001_raw_data/test1/6b0be04111f20e4db019930a7c33274caacb657b.jpg --label_path=./tmp/tmd001/labels.txt
 
 作业1
 训练：
