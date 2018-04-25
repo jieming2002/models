@@ -1,10 +1,14 @@
 """Generic evaluation script that evaluates a model using a given image."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import tensorflow as tf
 from datasets import dataset_factory
 from nets import nets_factory
 from preprocessing import preprocessing_factory
 import numpy as np
+# import pandas as pd
 import os
 
 
@@ -57,6 +61,16 @@ def get_label_predict_top_k(logits, labels, top_k):
         label_k += label_name
     return label_k
 
+# save filename , lable as csv
+def save_csv(image_list, predict_label):
+    save_arr = np.empty((10000, 2), dtype=np.str)
+    save_arr = pd.DataFrame(save_arr, columns=['filename', 'lable'])
+    for i in range(len(image_list)):
+        filename = image_list[i]
+        save_arr.values[i, 0] = filename
+        save_arr.values[i, 1] = predict_label[i]
+    save_arr.to_csv('submit_test.csv', decimal=',', encoding='utf-8', index=False, index_label=False)
+    print('submit_test.csv have been write, locate is :', os.getcwd())
 
 graph = tf.Graph().as_default()
 
@@ -102,12 +116,28 @@ with tf.Session() as sess:
     # print('checkpoint_path = ', checkpoint_path)
     # this method is more slow then output method
     saver.restore(sess, checkpoint_path)
-    # load the image
-    image_value = open(FLAGS.pic_path, mode='rb').read()
+    
+    image_name_list = []
+    predict_labels = []
+    num_images = 0
 
-    logit_value = sess.run([logit], feed_dict={placeholder:image_value})
-    # print('logit_value = ', logit_value)
-    image_name = os.path.basename(FLAGS.pic_path)
-    print('image name = ', image_name)
-    argmax = get_label_predict_top_k(logit_value, labels_to_class_names, 5)
-    print('top5 = ', argmax)
+    for filename in os.listdir(FLAGS.pic_path):
+        # load the image
+        path = os.path.join(FLAGS.pic_path, filename)
+        image_value = open(path, mode='rb').read()
+
+        logit_value = sess.run([logit], feed_dict={placeholder:image_value})
+        # print('logit_value = ', logit_value)
+        top_5 = get_label_predict_top_k(logit_value, labels_to_class_names, 5)
+
+        image_name_list.append(filename)
+        predict_labels.append(top_5)
+        # print(filename, top_5)
+        num_images += 1
+        print('num_images =', num_images)
+    
+    np.save('./tmp/image_name_list', image_name_list)
+    np.save('./tmp/predict_labels', predict_labels)
+    # print('image_name_list =', image_name_list)
+    # print('predict_labels =', predict_labels)
+    # save_csv(image_name_list, predict_labels)

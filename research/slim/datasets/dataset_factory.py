@@ -27,9 +27,9 @@ from datasets import tmd001
 datasets_map = {
     'cifar10': cifar10,
     'flowers': flowers,
+    'tmd001': tmd001,
     'imagenet': imagenet,
     'mnist': mnist,
-    'tmd001': tmd001,
 }
 
 

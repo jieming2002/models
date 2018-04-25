@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 research/slim/tmp/
+research/slim_just_local/
 
 # Distribution / packaging
 .Python
