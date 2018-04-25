@@ -5,8 +5,10 @@ __pycache__/
 
 # C extensions
 *.so
+
 research/slim/tmp/
 research/slim_just_local/
+research/slim/inference_with_checkpoint2.py
 
 # Distribution / packaging
 .Python

@@ -8,7 +8,7 @@ from datasets import dataset_factory
 from nets import nets_factory
 from preprocessing import preprocessing_factory
 import numpy as np
-# import pandas as pd
+import pandas as pd
 import os
 
 
@@ -64,7 +64,7 @@ def get_label_predict_top_k(logits, labels, top_k):
 # save filename , lable as csv
 def save_csv(image_list, predict_label):
     save_arr = np.empty((10000, 2), dtype=np.str)
-    save_arr = pd.DataFrame(save_arr, columns=['filename', 'lable'])
+    save_arr = pd.DataFrame(save_arr, columns=['filename', 'label'])
     for i in range(len(image_list)):
         filename = image_list[i]
         save_arr.values[i, 0] = filename
@@ -136,8 +136,6 @@ with tf.Session() as sess:
         num_images += 1
         print('num_images =', num_images)
     
-    np.save('./tmp/image_name_list', image_name_list)
-    np.save('./tmp/predict_labels', predict_labels)
     # print('image_name_list =', image_name_list)
     # print('predict_labels =', predict_labels)
-    # save_csv(image_name_list, predict_labels)
+    save_csv(image_name_list, predict_labels)
