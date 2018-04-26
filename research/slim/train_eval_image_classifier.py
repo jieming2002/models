@@ -40,7 +40,7 @@ if __name__ == '__main__':
     os.chdir(w_d)
 
     step_per_epoch = 32000 // FLAGS.batch_size
-    for i in range(30):
+    for i in range(10, 15):
         steps = int(step_per_epoch * (i + 1))
         # train 1 epoch
         print('################    train    ################')
