@@ -510,4 +510,5 @@ def _build_nasnet_base(images,
     predictions = tf.nn.softmax(logits, name='predictions')
     if add_and_check_endpoint('Predictions', predictions):
       return net, end_points
+  # print('skye end_points =', end_points)
   return logits, end_points

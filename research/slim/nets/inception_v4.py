@@ -330,6 +330,7 @@ def inception_v4(inputs, num_classes=1001, is_training=True,
                                         scope='Logits')
           end_points['Logits'] = logits
           end_points['Predictions'] = tf.nn.softmax(logits, name='Predictions')
+    # print('skye end_points =', end_points)
     return logits, end_points
 inception_v4.default_image_size = 299
 
