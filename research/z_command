@@ -11,6 +11,13 @@ python eval_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001
 
 python inference_with_checkpoint2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --pic_path=./tmp/tmd001_raw_data/test2 --label_path=./tmp/tmd001/labels.txt
 
+python inference_with_checkpoint2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec5rmsprop --pic_path=./tmp/tmd001_raw_data/test1 --label_path=./tmp/tmd001/labels.txt
+
+python inference_with_checkpoint3.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/令 --label_path=./tmp/tmd001/labels.txt
+
+python inference_with_checkpoint4.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/ --label_path=./tmp/tmd001/labels.txt
+
+
 ********************** nasnet_large
 python train_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --checkpoint_path=./tmp/checkpoints/nasnet_large/model.ckpt --model_name=nasnet_large --checkpoint_exclude_scopes=final_layer,aux_11/aux_logits --train_dir=./tmp/tmd001-models/nasnet_large --learning_rate=0.001 --optimizer=rmsprop  --batch_size=1
 
