@@ -3,6 +3,7 @@
 ******************* tinymind race001 
 python download_and_convert_data.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001_raw_data
 python image_augmentation.py --dataset_dir=./slim/tmp/tmd001_raw_data
+python image_augmentation2.py --dataset_dir=./slim/tmp/tmd001_raw_data
 
 ****************** inception_v4
 python train_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --checkpoint_path=./tmp/checkpoints/inception_v4.ckpt --model_name=inception_v4 --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --train_dir=./tmp/tmd001-models/inception_v4 --learning_rate=0.001 --optimizer=rmsprop  --batch_size=2
@@ -16,6 +17,11 @@ python inference_with_checkpoint2.py --dataset_name=tmd001 --dataset_dir=./tmp/t
 python inference_with_checkpoint3.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/令 --label_path=./tmp/tmd001/labels.txt
 
 python inference_with_checkpoint4.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/ --label_path=./tmp/tmd001/labels.txt
+
+#delete the wrong image
+python inference_with_checkpoint5.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/ --label_path=./tmp/tmd001/labels.txt
+
+python inference_with_checkpoint2-1.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/test1 --label_path=./tmp/tmd001/labels.txt
 
 
 ********************** nasnet_large

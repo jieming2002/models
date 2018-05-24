@@ -25,14 +25,21 @@ from datasets import dataset_utils
 # The URL where the Flowers data can be downloaded.
 #_DATA_URL = 'http://download.tensorflow.org/example_images/flower_photos.tgz'
 
-# The number of images in the validation set.
-_NUM_VALIDATION = 8000
+IS_TRAIN = True
+
+if IS_TRAIN:
+  # The number of images in the validation set.
+  _NUM_VALIDATION = 0
+  # The number of shards per dataset split.
+  _NUM_SHARDS = 10
+else:
+  # The number of images in the validation set.
+  _NUM_VALIDATION = 10000
+  # The number of shards per dataset split.
+  _NUM_SHARDS = 5
 
 # Seed for repeatability.
 _RANDOM_SEED = 0
-
-# The number of shards per dataset split.
-_NUM_SHARDS = 5
 
 
 class ImageReader(object):
@@ -55,7 +62,7 @@ class ImageReader(object):
     return image
 
 
-def _get_filenames_and_classes(dataset_dir):
+def _get_filenames_and_classes(dataset_dir, isTrain):
   """Returns a list of filenames and inferred class names.
 
   Args:
@@ -66,7 +73,12 @@ def _get_filenames_and_classes(dataset_dir):
     A list of image file paths, relative to `dataset_dir` and the list of
     subdirectories, representing class names.
   """
-  flower_root = os.path.join(dataset_dir, 'train')
+  # flower_root = os.path.join(dataset_dir, 'train')
+  if isTrain:
+    flower_root = os.path.join(dataset_dir, 'train_augment')
+  else:
+    flower_root = os.path.join(dataset_dir, 'test1-label')
+  
   directories = []
   class_names = []
   for filename in os.listdir(flower_root):
@@ -79,7 +91,8 @@ def _get_filenames_and_classes(dataset_dir):
   for directory in directories:
     for filename in os.listdir(directory):
       path = os.path.join(directory, filename)
-      photo_filenames.append(path)
+      if not os.path.isdir(path):
+        photo_filenames.append(path)
 
   return photo_filenames, sorted(class_names)
 
@@ -117,8 +130,8 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir):
           start_ndx = shard_id * num_per_shard
           end_ndx = min((shard_id+1) * num_per_shard, len(filenames))
           for i in range(start_ndx, end_ndx):
-            sys.stdout.write('\r>> Converting image %d/%d shard %d' % (
-                i+1, len(filenames), shard_id))
+            sys.stdout.write('\r>> Converting image %d/%d shard %d %s' % (
+                i+1, len(filenames), shard_id, filenames[i]))
             sys.stdout.flush()
 
             class_name = os.path.basename(os.path.dirname(filenames[i]))
@@ -160,7 +173,7 @@ def run(dataset_dir):
     return
 
   # dataset_utils.download_and_uncompress_tarball(_DATA_URL, dataset_dir)
-  photo_filenames, class_names = _get_filenames_and_classes(dataset_dir)
+  photo_filenames, class_names = _get_filenames_and_classes(dataset_dir, IS_TRAIN)
   class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
   # Divide into train and test:
