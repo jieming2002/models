@@ -39,7 +39,7 @@ if __name__ == '__main__':
     print('change working dir to [{0}]'.format(w_d))
     os.chdir(w_d)
 
-    step_per_epoch = 65628 // FLAGS.batch_size
+    step_per_epoch = 65632 // FLAGS.batch_size
     for i in range(0, 20):
         steps = int(step_per_epoch * (i + 1))
         # train 1 epoch
