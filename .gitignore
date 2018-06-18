@@ -8,9 +8,6 @@ __pycache__/
 
 research/slim/tmp/
 research/slim_just_local/
-research/slim/inference_with_checkpoint2.py
-research/slim/inference_with_checkpoint3.py
-research/slim/inference_with_checkpoint4.py
 
 # Distribution / packaging
 .Python
