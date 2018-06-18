@@ -4,16 +4,30 @@
 python download_and_convert_data.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001_raw_data
 python image_augmentation.py --dataset_dir=./slim/tmp/tmd001_raw_data
 python image_augmentation2.py --dataset_dir=./slim/tmp/tmd001_raw_data
+python check_image_rgb.py
 
 ****************** inception_v4
 python train_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --checkpoint_path=./tmp/checkpoints/inception_v4.ckpt --model_name=inception_v4 --checkpoint_exclude_scopes=InceptionV4/Logits,InceptionV4/AuxLogits/Aux_logits --train_dir=./tmp/tmd001-models/inception_v4 --learning_rate=0.001 --optimizer=rmsprop  --batch_size=2
 
 python eval_image_classifier.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --dataset_split_name=validation --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --eval_dir=./tmp/tmd001-models/inception_v4 --batch_size=8 --max_num_batches=12
 
-python inference_with_checkpoint2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --pic_path=./tmp/tmd001_raw_data/test2 --label_path=./tmp/tmd001/labels.txt
+**************** export summit csv 
+python inference_with_checkpoint.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec_16 --pic_path=./tmp/tmd001_data/test1 --label_path=./tmp/tmd001_data/tfrecord/labels.txt
+
+********** # 测试集，生成多个测试结果文件：top10-index.csv 、top10-label.csv、all-prob.csv
+python inference_with_checkpoint-2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec_14 --pic_path=./tmp/tmd001_data/test1 --label_path=./tmp/tmd001_data/tfrecord/labels.txt
+
+python inference_with_checkpoint-2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec_12 --pic_path=./tmp/tmd001_data/test2 --label_path=./tmp/tmd001_data/tfrecord/labels.txt
+
+************* # 训练集，生成多个测试结果文件：tr-top10-index.csv 、tr-top10-label.csv、tr-all-prob.csv
+python inference_with_checkpoint-3.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec_16 --pic_path=./tmp/tmd001_data/train_augment --label_path=./tmp/tmd001_data/tfrecord/labels.txt 
+
+**************** 
+python inference_with_checkpoint2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4 --pic_path=./tmp/tmd001_raw_data/test2 --label_path=./tmp/tmd001_data/tfrecord/labels.txt
 
 python inference_with_checkpoint2.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec5rmsprop --pic_path=./tmp/tmd001_raw_data/test1 --label_path=./tmp/tmd001/labels.txt
 
+#check wrong result
 python inference_with_checkpoint3.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/令 --label_path=./tmp/tmd001/labels.txt
 
 python inference_with_checkpoint4.py --dataset_name=tmd001 --dataset_dir=./tmp/tmd001 --model_name=inception_v4 --checkpoint_path=./tmp/tmd001-models/inception_v4/Exec4sgd --pic_path=./tmp/tmd001_raw_data/train/ --label_path=./tmp/tmd001/labels.txt

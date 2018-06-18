@@ -1,12 +1,5 @@
-r""" Converts Flowers data to TFRecords of TF-Example protos.
-
-This module downloads the Flowers data, uncompresses it, reads the files
-that make up the Flowers data and creates two TFRecord datasets: one for train
-and one for test. Each TFRecord dataset is comprised of a set of TF-Example
-protocol buffers, each of which contain a single image and label.
-
-The script should take about a minute to run.
-
+r""" inspect the photo is RGB or not. 
+if not then copy it to new dir.
 """
 
 from __future__ import absolute_import
@@ -14,9 +7,11 @@ from __future__ import division
 from __future__ import print_function
 
 import math
+from PIL import Image 
 import os
 import random
 import sys
+import shutil
 
 import tensorflow as tf
 
@@ -25,18 +20,21 @@ from datasets import dataset_utils
 # The URL where the Flowers data can be downloaded.
 #_DATA_URL = 'http://download.tensorflow.org/example_images/flower_photos.tgz'
 
-# Seed for repeatability.
-_RANDOM_SEED = 0
-# The number of shards per dataset split.
-_NUM_SHARDS = 5
 IS_TRAIN = True
 
 if IS_TRAIN:
   # The number of images in the validation set.
   _NUM_VALIDATION = 0
+  # The number of shards per dataset split.
+  _NUM_SHARDS = 10
 else:
   # The number of images in the validation set.
   _NUM_VALIDATION = 10000
+  # The number of shards per dataset split.
+  _NUM_SHARDS = 5
+
+# Seed for repeatability.
+# _RANDOM_SEED = 0
 
 
 class ImageReader(object):
@@ -73,8 +71,14 @@ def _get_filenames_and_classes(dataset_dir, isTrain):
   # flower_root = os.path.join(dataset_dir, 'train')
   if isTrain:
     flower_root = os.path.join(dataset_dir, 'train_augment')
+    # flower_root = os.path.join(dataset_dir, 'train_rgb')
+    # flower_root = os.path.join(dataset_dir, 'train_rgb_1')
   else:
     flower_root = os.path.join(dataset_dir, 'test1-label')
+  
+  rgb_root = os.path.join(dataset_dir, 'train_rgb_1')
+  if not tf.gfile.Exists(rgb_root):
+        tf.gfile.MakeDirs(rgb_root)
   
   directories = []
   class_names = []
@@ -84,6 +88,10 @@ def _get_filenames_and_classes(dataset_dir, isTrain):
       directories.append(path)
       class_names.append(filename)
 
+      rgb_path = os.path.join(rgb_root, filename)
+      if not tf.gfile.Exists(rgb_path):
+        tf.gfile.MakeDirs(rgb_path)
+
   photo_filenames = []
   for directory in directories:
     for filename in os.listdir(directory):
@@ -92,6 +100,20 @@ def _get_filenames_and_classes(dataset_dir, isTrain):
         photo_filenames.append(path)
 
   return photo_filenames, sorted(class_names)
+
+def get_outputname(filename):
+    # print('filename=', filename)
+    f_dir = os.path.dirname(filename)
+    # print('f_dir=', f_dir)
+    dir_name = os.path.basename(f_dir)
+    # print('dir_name=', dir_name)
+    p_dir = os.path.dirname(os.path.dirname(f_dir))
+    # print('p_dir', p_dir)
+    basename = os.path.basename(filename)
+    # print('basename=', basename)
+    output_filename = '%s/train_rgb_1/%s/%s' % (p_dir, dir_name, basename)
+    # print('output_filename=', output_filename)
+    return output_filename
 
 
 def _get_dataset_filename(dataset_dir, split_name, shard_id):
@@ -115,31 +137,43 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir):
   num_per_shard = int(math.ceil(len(filenames) / float(_NUM_SHARDS)))
 
   with tf.Graph().as_default():
-    image_reader = ImageReader()
+    # image_reader = ImageReader()
 
     with tf.Session('') as sess:
 
       for shard_id in range(_NUM_SHARDS):
-        output_filename = _get_dataset_filename(
-            dataset_dir, split_name, shard_id)
+        # output_filename = _get_dataset_filename(
+        #     dataset_dir, split_name, shard_id)
 
-        with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
-          start_ndx = shard_id * num_per_shard
-          end_ndx = min((shard_id+1) * num_per_shard, len(filenames))
-          for i in range(start_ndx, end_ndx):
-            sys.stdout.write('\r>> Converting image %d/%d shard %d %s' % (
+        # with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
+        start_ndx = shard_id * num_per_shard
+        end_ndx = min((shard_id+1) * num_per_shard, len(filenames))
+        for i in range(start_ndx, end_ndx):
+          sys.stdout.write('\r>> Converting image %d/%d shard %d %s' % (
                 i+1, len(filenames), shard_id, filenames[i]))
-            sys.stdout.flush()
-
-            class_name = os.path.basename(os.path.dirname(filenames[i]))
-            class_id = class_names_to_ids[class_name]
-            # Read the filename:
-            image_data = tf.gfile.FastGFile(filenames[i], 'rb').read()
+          sys.stdout.flush()
+          
+          with Image.open(filenames[i]) as img:
+            if img.mode != 'RGB' and img.mode != 'L':
+              # print(filenames[i]+', mode='+img.mode)
+              img_RGB = img.convert("RGB") 
+              img_RGB.save(get_outputname(filenames[i]))
+              # shutil.copyfile(filenames[i], get_outputname(filenames[i]))
+              os.remove(filenames[i]) #delete the wrong image
+            # else:
             
-            height, width = image_reader.read_image_dims(sess, image_data)
-            example = dataset_utils.image_to_tfexample(
-                image_data, b'jpg', height, width, class_id)
-            tfrecord_writer.write(example.SerializeToString())
+            # print(filenames[i]+', mode='+img.mode)
+          # break
+
+          # class_name = os.path.basename(os.path.dirname(filenames[i]))
+          # class_id = class_names_to_ids[class_name]
+          # Read the filename:
+          # image_data = tf.gfile.FastGFile(filenames[i], 'rb').read()
+          
+          # height, width = image_reader.read_image_dims(sess, image_data)
+          # example = dataset_utils.image_to_tfexample(
+          #     image_data, b'jpg', height, width, class_id)
+          # tfrecord_writer.write(example.SerializeToString())
 
   sys.stdout.write('\n')
   sys.stdout.flush()
@@ -155,7 +189,7 @@ def _dataset_exists(dataset_dir):
   return True
 
 
-def run(dataset_dir):
+def run(dataset_dir='./tmp/tmd001_raw_data'):
   """Runs the download and conversion operation.
 
   Args:
@@ -169,25 +203,27 @@ def run(dataset_dir):
     print('Dataset files already exist. Exiting without re-creating them.')
     return
 
-  # dataset_utils.download_and_uncompress_tarball(_DATA_URL, dataset_dir)
   photo_filenames, class_names = _get_filenames_and_classes(dataset_dir, IS_TRAIN)
   class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
   # Divide into train and test:
-  random.seed(_RANDOM_SEED)
-  random.shuffle(photo_filenames)
+  # random.seed(_RANDOM_SEED)
+  # random.shuffle(photo_filenames)
   training_filenames = photo_filenames[_NUM_VALIDATION:]
-  validation_filenames = photo_filenames[:_NUM_VALIDATION]
+  # validation_filenames = photo_filenames[:_NUM_VALIDATION]
 
   # First, convert the training and validation sets.
   _convert_dataset('train', training_filenames, class_names_to_ids,
                    dataset_dir)
-  _convert_dataset('validation', validation_filenames, class_names_to_ids,
-                   dataset_dir)
+  # _convert_dataset('validation', validation_filenames, class_names_to_ids,
+  #                  dataset_dir)
 
   # Finally, write the labels file:
-  labels_to_class_names = dict(zip(range(len(class_names)), class_names))
-  dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
+  # labels_to_class_names = dict(zip(range(len(class_names)), class_names))
+  # dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
 
   # _clean_up_temporary_files(dataset_dir)
   print('\nFinished converting the Flowers dataset!')
+
+
+run()

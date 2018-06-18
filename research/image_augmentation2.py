@@ -74,17 +74,17 @@ def _get_filenames_and_classes(dataset_dir):
         # print('path =', path)
         if os.path.isdir(path): #子目录
             augment_path = os.path.join(augment_root, filename)
-        if not tf.gfile.Exists(augment_path):
-            tf.gfile.MakeDirs(augment_path)
-        for filename2 in os.listdir(path): #遍历子目录 
-            fpath = os.path.join(path, filename2)
-            if os.path.isdir(fpath): #sun目录
-                # print('fpath =', fpath)
-                for filename3 in os.listdir(fpath): #遍历sun目录 
-                    path3 = os.path.join(fpath, filename3)
-                    # print('path3=', path3)
-                    photo_filenames.append(path3)
-                # break
+            if not tf.gfile.Exists(augment_path):
+                tf.gfile.MakeDirs(augment_path)
+            for filename2 in os.listdir(path): #遍历子目录 
+                fpath = os.path.join(path, filename2)
+                if os.path.isdir(fpath): #sun目录
+                    # print('fpath =', fpath)
+                    for filename3 in os.listdir(fpath): #遍历sun目录 
+                        path3 = os.path.join(fpath, filename3)
+                        # print('path3=', path3)
+                        photo_filenames.append(path3)
+                    # break
         # if path3 != None:
         #     break
     

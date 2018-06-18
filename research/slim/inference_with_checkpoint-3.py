@@ -1,5 +1,8 @@
 """Generic evaluation script that evaluates a model using a given image.
-export summit csv """
+on train data, only have subdir
+export tr-top10-index.csv 
+export tr-top10-label.csv 
+export tr-all-prob.csv """
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -52,26 +55,35 @@ def get_label_predict_top_k(logits, labels, top_k):
     predict_list = list(logits[0][0])
     # print('len(predict_list) =', len(predict_list))
     # print('predict_list =', predict_list)
-    
+    allProb = list(logits[0][0])
+    topChar = []
+    topIndex = []
     min_label = min(predict_list)
-    label_k = ''
+    
     for i in range(top_k):
         label = np.argmax(predict_list)
         predict_list.remove(predict_list[label])
         predict_list.insert(label, min_label)
+        topIndex.append(label)
         label_name = labels[label]
-        label_k += label_name
-    return label_k
+        topChar.append(label_name)
+    return topChar, topIndex, allProb
 
 # save filename , lable as csv
-def save_csv(image_list, predict_label):
-    save_arr = np.empty((10000, 2), dtype=np.str)
-    save_arr = pd.DataFrame(save_arr, columns=['filename', 'label'])
-    for i in range(len(image_list)):
-        filename = image_list[i]
-        save_arr.values[i, 0] = filename
-        save_arr.values[i, 1] = predict_label[i]
-    save_path = os.path.join(os.getcwd(), 'tmp/submit_test.csv')
+def save_csv(images, labels, predict, shape=(10000, 2), fname='submit_test.csv'):
+    # print('shape=', shape)
+    columns=['filename', 'label']
+    for i in range(shape[1]):
+        columns.append('col'+str(i+1))
+    # print('columns=', columns)
+    save_arr = np.empty((shape[0], len(columns)), dtype=np.str)
+    save_arr = pd.DataFrame(save_arr, columns=columns)
+    for i in range(len(images)):
+        save_arr.values[i, 0] = images[i]
+        save_arr.values[i, 1] = labels[i]
+        for j in range(shape[1]):
+            save_arr.values[i, j+2] = predict[i][j]
+    save_path = os.path.join(os.getcwd(), 'tmp/'+fname)
     save_arr.to_csv(save_path, decimal=',', encoding='utf-8', index=False, index_label=False)
     print('submit_test.csv have been write, locate is :', save_path)
 
@@ -98,9 +110,11 @@ def run():
 
         with open(FLAGS.label_path, encoding='utf-8') as inf:
             labels_to_class_names = {}
+            labels_to_index = {}
             for line in inf:
                 cols = line.strip().split(":")
                 labels_to_class_names[int(cols[0])] = cols[1]
+                labels_to_index[cols[1]] = int(cols[0])
             # print('labels_to_class_names =', labels_to_class_names)
 
         # begin setting graph
@@ -116,36 +130,62 @@ def run():
         with tf.Session() as sess:
             # print('FLAGS.checkpoint_path = ', FLAGS.checkpoint_path)
             checkpoint_path = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
-            # print('checkpoint_path = ', checkpoint_path)
+            print('checkpoint_path =', checkpoint_path)
             # this method is more slow then output method
             saver.restore(sess, checkpoint_path)
             
             image_name_list = []
+            labels = []
+            label_index = []
             predict_labels = []
-            num_images = 0
+            predict_index = []
+            predict_prob = []
+            num_dir = 0
             filenames = os.listdir(FLAGS.pic_path)
 
             for filename in filenames:
                 # load the image
                 path = os.path.join(FLAGS.pic_path, filename)
-                with open(path, mode='rb') as img_file:
-                    image_value = img_file.read()
-                    logit_value = sess.run([logit], feed_dict={placeholder:image_value})
-                    # print('logit_value = ', logit_value)
-                    top_5 = get_label_predict_top_k(logit_value, labels_to_class_names, 5)
+                if os.path.isdir(path):
+                    num_dir += 1
+                    num_images = 0
+                    subFiles = os.listdir(path)
+                    
+                    for subFile in subFiles:
+                        path2 = os.path.join(path, subFile)
+                        if os.path.isdir(path2):
+                            continue
+                        with open(path2, mode='rb') as img_file:
+                            image_value = img_file.read()
+                            logit_value = sess.run([logit], feed_dict={placeholder:image_value})
+                            # print('logit_value = ', logit_value)
+                            topChar, topIndex, allProb = get_label_predict_top_k(logit_value, labels_to_class_names, 10)
+                            # print(filename, topChar)
+                            # print(filename, topIndex)
+                            # print(filename, allProb)
 
-                    image_name_list.append(filename)
-                    predict_labels.append(top_5)
-                    # print(filename, top_5)
-                    num_images += 1
-                    # print('num_images =', num_images)
-                    sys.stdout.write('\r>> num_images %d/%d' % (num_images, len(filenames)))
-                    sys.stdout.flush()
+                            labels.append(filename)
+                            label_index.append(labels_to_index[filename])
+                            image_name_list.append(subFile)
+                            # labels.append(0)
+                            predict_labels.append(topChar)
+                            predict_index.append(topIndex)
+                            predict_prob.append(allProb)
+
+                            num_images += 1
+                            # print('num_images =', num_images)
+                            sys.stdout.write('\r>> num_images %d/%d num_dir %d/%d' % (num_images, len(subFiles), num_dir, len(filenames)))
+                            sys.stdout.flush()
+                        # if (num_images > 10):
+                        #     break
+                # break
             sys.stdout.write('\n')
             sys.stdout.flush()
             # print('image_name_list =', image_name_list)
             # print('predict_labels =', predict_labels)
-            save_csv(image_name_list, predict_labels)
+            save_csv(image_name_list, labels, predict_labels, shape=(len(predict_labels), len(topChar)), fname='tr-top10-label.csv')
+            save_csv(image_name_list, label_index, predict_index, shape=(len(predict_index), len(topIndex)), fname='tr-top10-index.csv')
+            save_csv(image_name_list, label_index, predict_prob, shape=(len(predict_prob), len(allProb)), fname='tr-all-prob.csv')
 
 
 run()
