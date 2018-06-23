@@ -13,7 +13,7 @@
 
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train.txt --log_dir=data/logs/ehualu_001/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size_1=4 --batch_size_2=2 --epoch_1=30 --epoch_2=100
 
-	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train_20.txt --log_dir=data/logs/ehualu_002/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size_1=2 --batch_size_2=1 --epoch_1=1 --epoch_2=2 --zip_path=data/ehualu/new/train_b.zip
+	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train_20.txt --output_dir=data/logs/ehualu_002/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size=2 --batch_size_2=1 --epoch=1 --epoch_2=2 --zip_path=data/ehualu/new/train_b.zip --learning_rate=1e-3
 
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train_20.txt --log_dir=data/logs/ehualu_002/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size_1=2 --batch_size_2=1 --epoch_1=1 --epoch_2=2
 

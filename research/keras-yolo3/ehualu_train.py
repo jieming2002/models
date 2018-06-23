@@ -20,7 +20,7 @@ from yolo3.utils import get_random_data
 
 def _main():
     annotation_path = FLAGS.annotation_path
-    log_dir = FLAGS.log_dir
+    log_dir = FLAGS.output_dir
     classes_path = FLAGS.classes_path
     anchors_path = FLAGS.anchors_path
     class_names = get_classes(classes_path)
@@ -61,12 +61,12 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        model.compile(optimizer=Adam(lr=1e-3), loss={
+        model.compile(optimizer=Adam(lr=FLAGS.learning_rate), loss={
             # use custom yolo_loss Lambda layer.
             'yolo_loss': lambda y_true, y_pred: y_pred})
 
-        batch_size = FLAGS.batch_size_1
-        epoch_1 = FLAGS.epoch_1 #50
+        batch_size = FLAGS.batch_size
+        epoch_1 = FLAGS.epoch #50
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes, zfile=zfile),
                 steps_per_epoch=max(1, num_train//batch_size),
@@ -82,7 +82,8 @@ def _main():
     if False:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
-        model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        # recompile to apply the change
+        model.compile(optimizer=Adam(lr=FLAGS.learning_rate * 0.1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) 
         print('Unfreeze all of the layers.')
 
         batch_size = FLAGS.batch_size_2 # note that more GPU memory is required after unfreezing the body
@@ -211,10 +212,10 @@ if __name__ == '__main__':
         help="annotation_path"
         )
     parser.add_argument(
-        "--log_dir",
+        "--output_dir",
         type=str,
         default="data/logs/ehualu_000",
-        help="log_dir"
+        help="output_dir"
         )
     parser.add_argument(
         "--classes_path",
@@ -241,13 +242,13 @@ if __name__ == '__main__':
         help="the path of weights file"
         )
     parser.add_argument(
-        "--batch_size_1",
+        "--batch_size",
         type=int,
         default=2,
         help="the batch_size of training frozen layers "
         )
     parser.add_argument(
-        "--epoch_1",
+        "--epoch",
         type=int,
         default=1,
         help="the epoch num of training frozen layers  "
@@ -259,29 +260,36 @@ if __name__ == '__main__':
         help="the batch_size of training all layers, smaller then batch_size_1, because need more resouce."
         )
     parser.add_argument(
+        "--epoch_2",
+        type=int,
+        default=2,
+        help="the epoch num of training all layers, should big then epoch_1."
+        )
+    parser.add_argument(
         "--zip_path",
         type=str,
         default='',
         help="the path of zipfile in which the images in it."
         )
     parser.add_argument(
-        "--epoch_2",
-        type=int,
-        default=2,
-        help="the epoch num of training all layers, should big then epoch_1."
+        "--learning_rate",
+        type=float,
+        default=1e-3,
+        help="the learning_rate."
         )
 
     FLAGS, unparsed = parser.parse_known_args()
     print('annotation_path =', FLAGS.annotation_path)
-    print('log_dir =', FLAGS.log_dir)
+    print('output_dir =', FLAGS.output_dir)
     print('classes_path =', FLAGS.classes_path)
     print('anchors_path =', FLAGS.anchors_path)
     print('tiny_weights_path =', FLAGS.tiny_weights_path)
     print('weights_path =', FLAGS.weights_path)
-    print('batch_size_1 =', FLAGS.batch_size_1)
-    print('epoch_1 =', FLAGS.epoch_1)
+    print('batch_size =', FLAGS.batch_size)
+    print('epoch =', FLAGS.epoch)
     print('batch_size_2 =', FLAGS.batch_size_2)
     print('epoch_2 =', FLAGS.epoch_2)
     print('zip_path =', FLAGS.zip_path)
+    print('learning_rate =', FLAGS.learning_rate)
 
     _main()
