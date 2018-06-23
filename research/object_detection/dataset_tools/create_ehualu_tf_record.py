@@ -95,8 +95,8 @@ def dict_to_tf_example(data,
     xmaxs.append(xmax / width)
     ymaxs.append(ymax / height)
 
-    classes_text.append('vv'.encode('utf8'))
-    classes.append(0)
+    classes_text.append('vehicle'.encode('utf8'))
+    classes.append(1)
     truncated.append(0)
     poses.append('pose'.encode('utf8'))
     
