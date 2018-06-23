@@ -1,5 +1,6 @@
 
 r"""Convert the ehualu dataset to TFRecord for object_detection.
+
 Example usage:
     python object_detection/dataset_tools/create_pet_tf_record.py \
         --data_dir=/home/user/pet \
@@ -20,7 +21,7 @@ import PIL.Image
 import tensorflow as tf
 
 from object_detection.utils import dataset_util
-from object_detection.utils import label_map_util
+# from object_detection.utils import label_map_util
 
 flags = tf.app.flags
 flags.DEFINE_string('data_dir', '', 'Root directory to raw dataset.')
@@ -55,7 +56,7 @@ def dict_to_tf_example(data,
   """
   filename, annotations = data
   img_path = os.path.join(image_subdirectory, filename)
-  print('img_path=', img_path)
+  # print('img_path=', img_path)
   with tf.gfile.GFile(img_path, 'rb') as fid:
     encoded_jpg = fid.read()
   
@@ -94,10 +95,10 @@ def dict_to_tf_example(data,
     xmaxs.append(xmax / width)
     ymaxs.append(ymax / height)
 
-    classes_text.append('vv')
+    classes_text.append('vv'.encode('utf8'))
     classes.append(0)
     truncated.append(0)
-    poses.append('pose')
+    poses.append('pose'.encode('utf8'))
     
   feature_dict = {
       'image/height': dataset_util.int64_feature(height),
@@ -118,7 +119,7 @@ def dict_to_tf_example(data,
       'image/object/view': dataset_util.bytes_list_feature(poses),
   }
 
-  print('feature_dict =', feature_dict)
+  # print('feature_dict =', feature_dict)
   example = tf.train.Example(features=tf.train.Features(feature=feature_dict))
   return example
 
@@ -138,14 +139,14 @@ def create_tf_record(output_filename,
   writer = tf.python_io.TFRecordWriter(output_filename)
   total = examples.shape[0]
   for i in range(total):
-    sys.stdout.write('\r>> On image %s / %s' % (i, total))
-    sys.stdout.flush()
     info = examples.iloc[i:i+1]
     # print('info =', info)
     name = info.name.values[0]
-    print('%s = %s' % (i, name))
+    # print('%s = %s' % (i, name))
     coordinate = info.coordinate.values[0]
-    print('coordinate =', coordinate)
+    # print('coordinate =', coordinate)
+    sys.stdout.write('\r>> On image %s/%s %s' % (i, total, name))
+    sys.stdout.flush()
     # skip the rows contain no target  
     if len(coordinate) < 1:  
       print('%s==%s no coordinate' % (i,name))
@@ -158,7 +159,7 @@ def create_tf_record(output_filename,
       writer.write(tf_example.SerializeToString())
     except ValueError:
       logging.warning('Invalid example: %s, ignoring.', name)
-    break
+    # break
   writer.close()
   sys.stdout.write('\n')
   sys.stdout.flush()
@@ -167,7 +168,8 @@ def create_tf_record(output_filename,
 # TODO: Add test for pet/PASCAL main files.
 def main(_):
   data_dir = FLAGS.data_dir
-  label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
+  # label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
+  label_map_dict = {}
   logging.info('Reading from dataset.')
   image_dir = os.path.join(data_dir, FLAGS.group)
   annotations_path = os.path.join(data_dir, '%s.csv' % FLAGS.group)
