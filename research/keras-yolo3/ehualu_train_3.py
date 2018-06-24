@@ -1,6 +1,6 @@
 """
 Retrain the YOLO model for your own dataset.
-new feature: support multi dataset, each dataset = {group}.zip、{group}_annotation.txt. 
+new feature: can read image from zipfile.
 """
 
 import numpy as np
@@ -19,7 +19,7 @@ from yolo3.utils import get_random_data
 
 
 def _main():
-    groups = FLAGS.groups.split(',')
+    annotation_path = FLAGS.annotation_path
     log_dir = FLAGS.output_dir
     classes_path = FLAGS.classes_path
     anchors_path = FLAGS.anchors_path
@@ -43,9 +43,20 @@ def _main():
         monitor='val_loss', save_weights_only=True, save_best_only=True, period=3)
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1)
     early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=1)
-    
-    lines, num_train, num_val = get_annotations(groups)
-    zip_dict = get_zip_dict(groups)
+
+    val_split = 0.1
+    with open(annotation_path) as f:
+        lines = f.readlines()
+    np.random.seed(10101)
+    np.random.shuffle(lines)
+    np.random.seed(None)
+    num_val = int(len(lines)*val_split)
+    num_train = len(lines) - num_val
+
+    if len(FLAGS.zip_path) > 4:
+        zfile = zipfile.ZipFile(FLAGS.zip_path, 'r')
+    else:
+        zfile = None
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
@@ -57,15 +68,14 @@ def _main():
         batch_size = FLAGS.batch_size
         epoch_1 = FLAGS.epoch #50
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit_generator(
-            data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes, zip_dict=zip_dict),
-            steps_per_epoch=max(1, num_train//batch_size),
-            validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes, zip_dict=zip_dict),
-            validation_steps=max(1, num_val//batch_size),
-            epochs=epoch_1, 
-            initial_epoch=0,
-            callbacks=[logging, checkpoint])
-        model.save_weights(os.path.join(log_dir,'trained_weights_stage_1.h5'))
+        model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes, zfile=zfile),
+                steps_per_epoch=max(1, num_train//batch_size),
+                validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes, zfile=zfile),
+                validation_steps=max(1, num_val//batch_size),
+                epochs=epoch_1, 
+                initial_epoch=0,
+                callbacks=[logging, checkpoint])
+        model.save_weights(os.path.join(log_dir + 'trained_weights_stage_1.h5'))
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
@@ -79,50 +89,19 @@ def _main():
         batch_size = FLAGS.batch_size_2 # note that more GPU memory is required after unfreezing the body
         epoch_2 = FLAGS.epoch_2 #100
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes, zip_dict=zip_dict),
+        model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes, zfile=zfile),
             steps_per_epoch=max(1, num_train//batch_size),
-            validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes, zip_dict=zip_dict),
+            validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes, zfile=zfile),
             validation_steps=max(1, num_val//batch_size),
             epochs=epoch_2, 
             initial_epoch=epoch_1,
             callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-        model.save_weights(os.path.join(log_dir,'trained_weights_final.h5'))
+        model.save_weights(os.path.join(log_dir + 'trained_weights_final.h5'))
 
     # Further training if needed.
-    close_zip_dict(zip_dict, groups)
-    print('training complete!')
-
-
-def get_annotations(groups):
-    lines = []
-    for group in groups:
-        path = os.path.join(FLAGS.dataset_path, '%s_annotation.txt' % group)
-        with open(path) as f:
-            lines += f.readlines()
-            # print('lines=', len(lines))
-    
-    val_split = 0.1
-    np.random.seed(10101)
-    np.random.shuffle(lines)
-    np.random.seed(None)
-    num_val = int(len(lines)*val_split)
-    num_train = len(lines) - num_val
-
-    return lines, num_train, num_val
-
-
-def get_zip_dict(groups):
-    zip_dict = {}
-    for group in groups:
-        zip_path = os.path.join(FLAGS.dataset_path, '%s.zip' % group)
-        zip_dict[group] = zipfile.ZipFile(zip_path, 'r')
-    return zip_dict
-
-
-def close_zip_dict(zip_dict, groups):
-    for group in groups:
-        zfile = zip_dict[group]
+    if not zfile == None:
         zfile.close()
+    print('training complete!')
 
 
 def get_classes(classes_path):
@@ -200,7 +179,7 @@ def create_tiny_model(input_shape, anchors, num_classes, load_pretrained=True, f
 
     return model
 
-def data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes, zip_dict=None):
+def data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes, zfile=None):
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
@@ -210,7 +189,7 @@ def data_generator(annotation_lines, batch_size, input_shape, anchors, num_class
         for b in range(batch_size):
             if i==0:
                 np.random.shuffle(annotation_lines)
-            image, box = get_random_data(annotation_lines[i], input_shape, random=True, zip_dict=zip_dict)
+            image, box = get_random_data(annotation_lines[i], input_shape, random=True, zfile=zfile)
             image_data.append(image)
             box_data.append(box)
             i = (i+1) % n
@@ -219,18 +198,18 @@ def data_generator(annotation_lines, batch_size, input_shape, anchors, num_class
         y_true = preprocess_true_boxes(box_data, input_shape, anchors, num_classes)
         yield [image_data, *y_true], np.zeros(batch_size)
 
-def data_generator_wrapper(annotation_lines, batch_size, input_shape, anchors, num_classes, zip_dict=None):
+def data_generator_wrapper(annotation_lines, batch_size, input_shape, anchors, num_classes, zfile=None):
     n = len(annotation_lines)
     if n==0 or batch_size<=0: return None
-    return data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes, zip_dict=zip_dict)
+    return data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes, zfile=zfile)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--dataset_path",
+        "--annotation_path",
         type=str,
-        default='data/new/',
-        help="dataset_path"
+        default='data/new/train_b_train.txt',
+        help="annotation_path"
         )
     parser.add_argument(
         "--output_dir",
@@ -287,10 +266,10 @@ if __name__ == '__main__':
         help="the epoch num of training all layers, should big then epoch_1."
         )
     parser.add_argument(
-        "--groups",
+        "--zip_path",
         type=str,
-        default='a,b,c',
-        help="the groups of dataset."
+        default='',
+        help="the path of zipfile in which the images in it."
         )
     parser.add_argument(
         "--learning_rate",
@@ -300,7 +279,7 @@ if __name__ == '__main__':
         )
 
     FLAGS, unparsed = parser.parse_known_args()
-    print('dataset_path =', FLAGS.dataset_path)
+    print('annotation_path =', FLAGS.annotation_path)
     print('output_dir =', FLAGS.output_dir)
     print('classes_path =', FLAGS.classes_path)
     print('anchors_path =', FLAGS.anchors_path)
@@ -310,7 +289,7 @@ if __name__ == '__main__':
     print('epoch =', FLAGS.epoch)
     print('batch_size_2 =', FLAGS.batch_size_2)
     print('epoch_2 =', FLAGS.epoch_2)
-    print('groups =', FLAGS.groups)
+    print('zip_path =', FLAGS.zip_path)
     print('learning_rate =', FLAGS.learning_rate)
 
     _main()

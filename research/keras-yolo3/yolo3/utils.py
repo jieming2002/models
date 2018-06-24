@@ -35,16 +35,19 @@ def rand(a=0, b=1):
     return np.random.rand()*(b-a) + a
 
 def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jitter=.3, 
-                    hue=.1, sat=1.5, val=1.5, proc_img=True, zfile=None):
+                    hue=.1, sat=1.5, val=1.5, proc_img=True, zip_dict=None):
     '''random preprocessing for real-time data augmentation.
     
     Args:
-        zfile: the zipfile that the images in it.
+        zip_dict: the dictionary of zipfile that the images in it.
     '''
     line = annotation_line.split()
     filename = line[0]
     
-    if not zfile == None:
+    if not zip_dict == None:
+        group = os.path.basename(os.path.dirname(filename))
+        # print('group =%s' % (group))
+        zfile = zip_dict[group]
         filename = os.path.basename(filename)
         fdata = zfile.read(filename)
         encoded_jpg_io = io.BytesIO(fdata)

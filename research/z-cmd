@@ -6,16 +6,34 @@
 
 	python keras-yolo3/convert.py yolov3.cfg ./data/yolov3.weights ./model_data/yolo.h5
 	python keras-yolo3/yolo.py --model_path=./model_data/yolo_weights.h5 --classes_path=./model_data/voc_classes.txt
+	
+**************** ehualu_train_1.py ***** Retrain the YOLO model for your own dataset.
 
 	python keras-yolo3/ehualu_annotation.py --data_group=train_b --raw_dir=data/ehualu/raw --new_dir=data/ehualu/new
+
+	python keras-yolo3/ehualu_train.py
+
+******** ehualu_train_2.py ************** accept params from outside 
 
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train.txt --log_dir=data/logs/ehualu_001/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_000/ep018-loss36.388-val_loss33.409.h5 --batch_size_1=4 --batch_size_2=2 --epoch_1=1 --epoch_2=2
 
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train.txt --log_dir=data/logs/ehualu_001/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size_1=4 --batch_size_2=2 --epoch_1=30 --epoch_2=100
 
+********* ehualu_train_3.py  ************  can read image from zipfile. 
+*********** 【注意】：图片压缩包必须是 zip 文件，且压缩图片时不能包含目录，只包含图片。
+
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train_20.txt --output_dir=data/logs/ehualu_002/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size=2 --batch_size_2=1 --epoch=1 --epoch_2=2 --zip_path=data/ehualu/new/train_b.zip --learning_rate=1e-3
 
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --annotation_path=data/ehualu/new/train_b_train_20.txt --log_dir=data/logs/ehualu_002/ --classes_path=data/ehualu/ehualu_classes.txt --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --batch_size_1=2 --batch_size_2=1 --epoch_1=1 --epoch_2=2
+
+****************************** support multi dataset, each dataset = {group}.zip、{group}_annotation.txt. 
+用groups=train_b,train_c 指定，每个训练集两个文件：
+图片压缩包 {group}.zip、图片标签 {group}_annotation.txt. 例如：train_b.zip、train_b_annotation.txt
+【注意】需要图片标签文件中，包含图片名称及其group，比如 {group}/{imageName} 而且 group 必须和图片所在压缩包名称一致。
+
+	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --classes_path=data/ehualu/ehualu_classes.txt --output_dir=data/logs/ehualu_002/ --dataset_path=data/ehualu/tmp/ --groups=train_b,train_c --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --learning_rate=1e-3 --batch_size=2 --batch_size_2=1 --epoch=1 --epoch_2=2  
+
+*************************** test
 
 	python keras-yolo3/ehualu_yolo.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_000/ep018-loss36.388-val_loss33.409.h5 --classes_path=data/ehualu/ehualu_classes.txt --img_root=data/ehualu/raw/test_a --summit_dir=data/ehualu/summit
 
