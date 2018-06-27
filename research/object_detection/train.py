@@ -107,6 +107,7 @@ def main(_):
 
   model_config = configs['model']
   train_config = configs['train_config']
+  print('train_config.batch_size =', train_config.batch_size)
   input_config = configs['train_input_config']
 
   model_fn = functools.partial(
