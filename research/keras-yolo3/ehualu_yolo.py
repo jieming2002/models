@@ -6,6 +6,7 @@ Run a YOLO_v3 style detection model on test images.
 
 import colorsys
 import os
+import sys
 import argparse
 from timeit import default_timer as timer
 
@@ -207,12 +208,17 @@ def detect_img(yolo):
                 # print('out_str =', filename+' '+out_str)
                 names.append(filename)
                 boxes_str.append(out_str)
-                print('i =', (i,total))
+                # print('i =', (i,total))
+                sys.stdout.write('\r>> i = %s / %s' % ((i+1),total))
+                sys.stdout.flush()
         # break
+    sys.stdout.write('\n')
+    sys.stdout.flush()
     summit = pd.DataFrame({'name':names})
     summit['coordinate'] = boxes_str
     path = os.path.join(FLAGS.summit_dir, 'summit.csv')
     summit.to_csv(path, index=False)
+    print('path =', path)
 
     yolo.close_session()
 
