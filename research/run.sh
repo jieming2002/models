@@ -17,7 +17,7 @@ checkpoint_dir=$train_dir
 eval_dir=$output_dir/eval
 
 # config文件
-config=faster_rcnn_inception_resnet_v2_ehualu3.config
+config=faster_rcnn_inception_resnet_v2_ehualu2.config
 pipeline_config_path=$output_dir/$config
 
 # 先清空输出目录，本地运行会有效果，tinymind上运行这一行没有任何效果
