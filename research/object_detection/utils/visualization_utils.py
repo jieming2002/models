@@ -158,6 +158,8 @@ def draw_bounding_box_on_image(image,
                                   ymin * im_height, ymax * im_height)
   else:
     (left, right, top, bottom) = (xmin, xmax, ymin, ymax)
+  
+  # print(display_str_list, (left, top, right-left, bottom - top))
   draw.line([(left, top), (left, bottom), (right, bottom),
              (right, top), (left, top)], width=thickness, fill=color)
   try:
@@ -453,7 +455,7 @@ def visualize_boxes_and_labels_on_image_array(image,
             class_name = 'N/A'
           display_str = '{}: {}%'.format(
               class_name,
-              int(100*scores[i]))
+              int(10000*scores[i])/100)
         else:
           display_str = 'score: {}%'.format(int(100 * scores[i]))
         box_to_display_str_map[box].append(display_str)
