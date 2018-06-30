@@ -44,36 +44,39 @@ def show_result_on_image(image_np, boxes, classes, scores):
         line_thickness=8)
     plt.imsave(os.path.join(FLAGS.output_dir, 'output.png'), image_np)
 
-def convert_result_to_str(boxes, scores, classes, image, min_score_thresh=.3, to_int=True):
+def convert_result_to_str(boxes, scores, classes, image, min_score_thresh=.3):
     out_str = ''
+    out_str_int = ''
     for i, score in reversed(list(enumerate(scores[0]))):
         box = boxes[0][i]
         if score > min_score_thresh:
             # print('i=%s, score=%s box=%s' % (i, score, box))
             top, left, bottom, right = box
-            if to_int:
-                top = max(0, np.round(top*image.size[1]).astype('int32'))
-                left = max(0, np.round(left*image.size[0]).astype('int32'))
-                bottom = min(image.size[1], np.round(bottom*image.size[1]).astype('int32'))
-                right = min(image.size[0], np.round(right*image.size[0]).astype('int32'))
-            else:
-                top = max(0, top*image.size[1])
-                left = max(0, left*image.size[0])
-                bottom = min(image.size[1], bottom*image.size[1])
-                right = min(image.size[0], right*image.size[0])
+
+            top = max(0, top*image.size[1])
+            left = max(0, left*image.size[0])
+            bottom = min(image.size[1], bottom*image.size[1])
+            right = min(image.size[0], right*image.size[0])
             width = right - left
             height = bottom - top
-        
+
+            top_int = np.round(top).astype('int32')
+            left_int = np.round(left).astype('int32')
+            width_int = np.round(width).astype('int32')
+            height_int = np.round(height).astype('int32')
+
             # print(i, (left, top), (right, bottom), (width, height))
             out_str += '_'.join([str(left), str(top), str(width), str(height)])
+            out_str_int += '_'.join([str(left_int), str(top_int), str(width_int), str(height_int)])
             if i > 0:
                 out_str += ';'
-    return out_str
+    return out_str_int, out_str
 
 
 def test_images_in_dir(image_tensor, detection_boxes, detection_scores, detection_classes, num_detections, sess):
     names = []
     boxes_str = []
+    boxes_str_int = []
     file_list = os.listdir(FLAGS.images_dir)
     total = len(file_list)
     
@@ -99,14 +102,23 @@ def test_images_in_dir(image_tensor, detection_boxes, detection_scores, detectio
 
                 names.append(filename)
                 # print('filename=', filename)
-                out_str = convert_result_to_str(boxes, scores, classes, image)
+                out_str_int, out_str = convert_result_to_str(boxes, scores, classes, image)
+                # print('out_str_int=', out_str_int)
                 # print('out_str=', out_str)
+                boxes_str_int.append(out_str_int)
                 boxes_str.append(out_str)
                 sys.stdout.write('\r>> i = %s / %s' % ((i+1),total))
                 sys.stdout.flush()
         # break
     sys.stdout.write('\n')
     sys.stdout.flush()
+
+    summit = pd.DataFrame({'name':names})
+    summit['coordinate'] = boxes_str_int
+    path = os.path.join(FLAGS.output_dir, 'summit_int.csv')
+    summit.to_csv(path, index=False)
+    print('path =', path)
+
     summit = pd.DataFrame({'name':names})
     summit['coordinate'] = boxes_str
     path = os.path.join(FLAGS.output_dir, 'summit.csv')
