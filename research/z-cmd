@@ -39,14 +39,19 @@
 
 *************************** test
 
-	python keras-yolo3/ehualu_yolo.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_004/ep009-loss35.907-val_loss32.660.h5 --classes_path=data/ehualu/ehualu_classes.txt --img_root=data/ehualu/raw/test_a --summit_dir=data/ehualu/summit
+	python keras-yolo3/ehualu_yolo.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_004/ep045-loss35.318-val_loss30.547.h5 --classes_path=data/ehualu/ehualu_classes.txt --img_root=data/ehualu/raw/test_a --summit_dir=data/ehualu/summit
 
 	python keras-yolo3/ehualu_yolo1.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_000/ep018-loss36.388-val_loss33.409.h5 --classes_path=data/ehualu/ehualu_classes.txt
 
-***************************  inference_all of object detection
+**************************************** object_detection ***************************************************************************************
 	# 设置目录，避免module找不到的问题
 	export PYTHONPATH=$PYTHONPATH:$PWD:$PWD/slim:$PWD/object_detection
+***************************  # 导出模型 
+	python ./object_detection/export_inference_graph.py --input_type=image_tensor --pipeline_config_path=./pipeline_config/faster_rcnn_resnet101_ehualu.config --trained_checkpoint_prefix=./output/Exec#7-14275/model.ckpt-14275 --output_directory=./output/Exec#7-14275/
+
+***************************  inference_all of object detection
 	python inference_all.py --output_dir=output/Exec#3-5400 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
+	python inference_all.py --output_dir=output/Exec#7-14275 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
 
 
 
