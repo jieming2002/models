@@ -44,7 +44,7 @@ def show_result_on_image(image_np, boxes, classes, scores):
         line_thickness=8)
     plt.imsave(os.path.join(FLAGS.output_dir, 'output.png'), image_np)
 
-def convert_result_to_str(boxes, scores, classes, image, min_score_thresh=.3):
+def convert_result_to_str(boxes, scores, classes, image, min_score_thresh=.2):
     out_str = ''
     out_str_int = ''
     for i, score in reversed(list(enumerate(scores[0]))):
@@ -69,6 +69,7 @@ def convert_result_to_str(boxes, scores, classes, image, min_score_thresh=.3):
             out_str += '_'.join([str(left), str(top), str(width), str(height)])
             out_str_int += '_'.join([str(left_int), str(top_int), str(width_int), str(height_int)])
             if i > 0:
+                out_str_int += ';'
                 out_str += ';'
     return out_str_int, out_str
 
