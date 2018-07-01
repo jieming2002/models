@@ -51,7 +51,7 @@
 
 ***************************  inference_all of object detection
 	python inference_all.py --output_dir=output/Exec#3-4950 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
-	python inference_all.py --output_dir=output/Exec#7-14275 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
+	python inference_all.py --output_dir=output/Exec#9-9000 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
 
 
 
