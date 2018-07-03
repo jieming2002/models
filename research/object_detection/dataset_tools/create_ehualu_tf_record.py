@@ -174,7 +174,9 @@ def main(_):
   image_dir = os.path.join(data_dir, FLAGS.group)
   annotations_path = os.path.join(data_dir, '%s.csv' % FLAGS.group)
   annotations_info = pd.read_csv(annotations_path)
-  train_examples, val_examples = train_test_split(annotations_info, test_size=0.1, random_state=42)
+
+  # 60000 * 0.001 = 60
+  train_examples, val_examples = train_test_split(annotations_info, test_size=0.001, random_state=42)
   # print('num_examples=%s  num_train=%s' % (train_examples.shape, val_examples.shape))
   logging.info('%s training and %s validation examples.', train_examples.shape, val_examples.shape)
 
