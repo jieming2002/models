@@ -120,11 +120,12 @@ def test_images_in_dir(image_tensor, detection_boxes, detection_scores, detectio
     summit.to_csv(path, index=False)
     print('path =', path)
 
-    summit = pd.DataFrame({'name':names})
-    summit['coordinate'] = boxes_str
-    path = os.path.join(FLAGS.output_dir, 'summit.csv')
-    summit.to_csv(path, index=False)
-    print('path =', path)
+    if False:
+        summit = pd.DataFrame({'name':names})
+        summit['coordinate'] = boxes_str
+        path = os.path.join(FLAGS.output_dir, 'summit.csv')
+        summit.to_csv(path, index=False)
+        print('path =', path)
 
 
 if __name__ == '__main__':
