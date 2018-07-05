@@ -1,6 +1,6 @@
 """
 Retrain the YOLO model for your own dataset.
-new feature: only unfreeze part of layers: 0.2, 0.25, 0.3, 0.5
+new feature: support multi dataset, each dataset = {group}.zip、{group}_annotation.txt. 
 """
 
 import numpy as np
@@ -69,14 +69,8 @@ def _main():
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    total_layers = len(model.layers)
-    # from_layer = int(total_layers * 0.8) # only unfreeze 1/5
-    from_layer = int(total_layers * 0.5) # only unfreeze 1/2
-    # from_layer = 0 # tiny unfreeze all
-    to_layer = total_layers
-    print('total_layers=%s from_layer=%s to_layer=%s'%(total_layers, from_layer, to_layer))
-    if True:
-        for i in range(from_layer, to_layer):
+    if False:
+        for i in range(len(model.layers)):
             model.layers[i].trainable = True
         # recompile to apply the change
         model.compile(optimizer=Adam(lr=FLAGS.learning_rate * 0.1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) 
