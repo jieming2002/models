@@ -17,7 +17,7 @@ checkpoint_dir=$train_dir
 eval_dir=$output_dir/eval
 
 # config文件
-config=faster_rcnn_inception_resnet_v2_ehualu.config
+config=faster_rcnn_inception_resnet_v2_ehualu6.config
 pipeline_config_path=$output_dir/$config
 
 # 先清空输出目录，本地运行会有效果，tinymind上运行这一行没有任何效果
@@ -28,11 +28,11 @@ pipeline_config_path=$output_dir/$config
 cp $dataset_dir/$config $pipeline_config_path
 
 # 每个 epoch 训练步骤总数 = 训练样本总量 / batch_size
-step_num=900
+step_num=9000
 # step_num=50
 
 # for 循环中的代码执行 5 次，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
-for i in {6..14}
+for i in {0..4}
 do
     echo "############" $i "runnning #################"
     last=$[$i*$step_num]
