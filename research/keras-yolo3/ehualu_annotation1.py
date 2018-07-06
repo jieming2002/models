@@ -29,7 +29,7 @@ print('raw_dir ', FLAGS.raw_dir)
 print('new_dir ', FLAGS.new_dir)
 
 wd = os.getcwd()
-sets=[(FLAGS.data_group, 'annotation')]
+sets=[(FLAGS.data_group, 'train')]
 
 # classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 classes = ["vehicle"]
@@ -79,7 +79,7 @@ for group, sub_set in sets:
                 continue
             # write a file path to the list
             # file_path = '%s/%s/%s/%s'%(wd, FLAGS.raw_dir, group, name)
-            file_path = '%s/%s' % (group, name)
+            file_path = os.path.join(wd, FLAGS.raw_dir, group, name)
             # print('file_path =', file_path)
             list_file.write(file_path)
             convert_annotation(group, name, coordinate, list_file)
