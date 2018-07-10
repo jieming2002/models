@@ -30,14 +30,14 @@
 
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --classes_path=data/ehualu/ehualu_classes.txt --output_dir=data/logs/ehualu_003/ --dataset_path=data/ehualu/new/ --groups=train_b --weights_path=data/logs/ehualu_001/stage_1_loss35.4338-val_loss29.9655.h5 --learning_rate=1e-4 --batch_size=2 --batch_size_2=1 --epoch=100 --epoch_2=2 
 
-	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --classes_path=data/ehualu/ehualu_classes.txt --output_dir=data/logs/ehualu_010/ --dataset_path=data/ehualu/new/ --groups=train_b,aug_train_b --weights_path=data/logs/ehualu_007/ep003-loss30.044-val_loss27.589.h5 --learning_rate=1e-5 --batch_size=4 --batch_size_2=2 --epoch=30 --epoch_2=60  
+	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --classes_path=data/ehualu/ehualu_classes.txt --output_dir=data/logs/ehualu_009/ --dataset_path=data/ehualu/new/ --groups=train_b,aug_train_b --weights_path=data/logs/ehualu_007/ep003-loss30.044-val_loss27.589.h5 --learning_rate=1e-5 --batch_size=4 --batch_size_2=2 --epoch=10 --epoch_2=20  
 
 ********************************** train tiny =效果太差了
 	python keras-yolo3/ehualu_train.py --anchors_path=keras-yolo3/model_data/tiny_yolo_anchors.txt --classes_path=data/ehualu/ehualu_classes.txt --output_dir=data/logs/ehualu_008/ --dataset_path=data/ehualu/new/ --groups=train_b --tiny_weights_path=data/logs/ehualu_008/trained_weights_final.h5 --learning_rate=1e-4 --batch_size=8 --batch_size_2=4 --epoch=25 --epoch_2=25 
 
 ************************************************************************ test
 
-	python keras-yolo3/ehualu_yolo.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_007/trained_weights_stage_1.h5 --classes_path=data/ehualu/ehualu_classes.txt --img_root=data/ehualu/raw/test_a --summit_dir=data/ehualu/summit
+	python keras-yolo3/ehualu_yolo.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_009/trained_weights_final.h5 --classes_path=data/ehualu/ehualu_classes.txt --img_root=data/ehualu/raw/test_a --summit_dir=data/ehualu/summit 
 
 	python keras-yolo3/ehualu_yolo1.py --anchors_path=keras-yolo3/model_data/yolo_anchors.txt --model_path=data/logs/ehualu_000/ep018-loss36.388-val_loss33.409.h5 --classes_path=data/ehualu/ehualu_classes.txt
 
@@ -61,7 +61,7 @@
 
 ***************************  inference_all of object detection
 	python inference_all.py --output_dir=output/Exec#3-4950 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
-	python inference_all.py --output_dir=output/Exec#15-13846 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
+	python inference_all.py --output_dir=output/Exec#28-29700 --dataset_dir=data/jieming2002/race003-ehualu-object-detection --images_dir=data/ehualu/raw/test_a
 
 
 
