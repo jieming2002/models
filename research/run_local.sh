@@ -29,7 +29,7 @@ cp $dataset_dir/$config $pipeline_config_path
 
 step_num=10
 
-for i in {0..1}  # {0..5} for循环中的代码执行 5 次，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
+for i in {0..1} # {0..5} for循环中的代码执行 5 次，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
 do
     echo "############" $i "runnning #################"
     last=$[$i*$step_num]
