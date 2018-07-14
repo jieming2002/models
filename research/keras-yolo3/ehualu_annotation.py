@@ -45,6 +45,8 @@ def convert_annotation(group, name, coordinate, list_file):
         # x, y, width, height
         bbox = annotation.split('_') 
         # print('bbox =', bbox)
+        if len(bbox) < 4:
+            continue
         # b = (int(xmlbox.find('xmin').text), int(xmlbox.find('ymin').text), int(xmlbox.find('xmax').text), int(xmlbox.find('ymax').text))
         b = [int(float(bbox[0])), int(float(bbox[1])), int(float(bbox[2])), int(float(bbox[3]))]
         # print('b =', b)
@@ -74,7 +76,10 @@ for group, sub_set in sets:
             coordinate = info.coordinate.values[0]
             # print('coordinate =', coordinate)
             # skip the rows contain no target  
-            if len(coordinate) < 1:  
+            if not isinstance(coordinate, str):
+                print('%s = %s coordinate= %s' % (i,name,coordinate))
+                continue
+            if isinstance(coordinate, str) and len(coordinate) < 7:
                 print('%s = %s coordinate= %s' % (i,name,coordinate))
                 continue
             # write a file path to the list
