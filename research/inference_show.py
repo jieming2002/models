@@ -32,7 +32,7 @@ def load_image_into_numpy_array(image):
         (im_height, im_width, 3)).astype(np.uint8)
 
 
-def show_result_on_image(image_np, boxes, classes, scores):
+def show_result_on_image(image_np, boxes, classes, scores, filename):
     image_np = vis_util.visualize_boxes_and_labels_on_image_array(
         image_np,
         np.squeeze(boxes),
@@ -40,9 +40,9 @@ def show_result_on_image(image_np, boxes, classes, scores):
         np.squeeze(scores),
         category_index,
         use_normalized_coordinates=True,
-        min_score_thresh=0.2,
-        line_thickness=8)
-    plt.imsave(os.path.join(FLAGS.output_dir, 'output.png'), image_np)
+        min_score_thresh=0.5,
+        line_thickness=1)
+    plt.imsave(os.path.join(FLAGS.output_dir, filename+'_output.png'), image_np)
 
 def convert_result_to_str(boxes, scores, classes, image, min_score_thresh=.2):
     out_str = ''
@@ -103,7 +103,7 @@ def test_images_in_dir(image_tensor, detection_boxes, detection_scores, detectio
                 # print('skye boxes=', boxes)
                 # print('skye scores=',scores)
                 # print('skye classes=', classes)
-                # show_result_on_image(image_np, boxes, classes, scores)
+                show_result_on_image(image_np, boxes, classes, scores, filename)
 
                 names.append(filename)
                 # print('filename=', filename)

@@ -107,7 +107,8 @@ def get_annotations(groups):
             lines += f.readlines()
             # print('lines=', len(lines))
     
-    val_split = 0.1
+    # val_split = 0.1
+    val_split = 0.01
     np.random.seed(10101)
     np.random.shuffle(lines)
     np.random.seed(None)
