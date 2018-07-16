@@ -69,8 +69,10 @@ def freeze_graph_with_def_protos(
     if optimize_graph:
       logging.info('Graph Rewriter optimizations enabled')
       rewrite_options = rewriter_config_pb2.RewriterConfig(
-          # layout_optimizer=rewriter_config_pb2.RewriterConfig.ON)
-          optimize_tensor_layout=rewriter_config_pb2.RewriterConfig.ON)
+          # layout_optimizer=rewriter_config_pb2.RewriterConfig.ON
+          # ValueError: Protocol message RewriterConfig has no "optimize_tensor_layout" field
+          # optimize_tensor_layout=rewriter_config_pb2.RewriterConfig.ON
+      )
       rewrite_options.optimizers.append('pruning')
       rewrite_options.optimizers.append('constfold')
       rewrite_options.optimizers.append('layout')
