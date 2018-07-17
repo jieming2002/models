@@ -28,10 +28,11 @@ pipeline_config_path=$output_dir/$config
 cp $dataset_dir/$config $pipeline_config_path
 
 # 每个 epoch 训练步骤总数 = 训练样本总量 / batch_size
-# step_num=50
-step_num=41388
+step_num=130000
+# step_num=41388
 
-for i in {0..2} # for 循环中的代码执行 5 次，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
+# for i in {0..2} # for 循环中的代码执行 5 次，这里的左右边界都包含，也就是一共训练500个step，每100step验证一次
+for(( i=0; i<1; i++)) # 只循环一次
 do
     echo "############" $i "runnning #################"
     last=$[$i*$step_num]
